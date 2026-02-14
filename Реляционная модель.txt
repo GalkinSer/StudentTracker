@@ -1,0 +1,40 @@
+- Студент [Student]:
+Id int Int32
+Name nvarchar(100) string
+StudentCardNumber int Int32
+IsRepresentative bit bool
+GroupId int ссылка на экземпляр класса
+
+- Группа [Group]:
+Id int Int32
+Name nvarchar(10) string
+
+- Предмет [Subject]:
+Id int Int32
+Name nvarchar(100) string
+
+- Преподаватель [Teacher]:
+Id int Int32
+Name nvarchar(100) string
+PasswordHash nvarchar(max) string
+
+- Изучает [Studies]:
+GroupId int ссылка на экземпляр класса
+SubjectId int ссылка на экземпляр класса
+
+- Преподаёт [Teaches]:
+TeacherId int ссылка на экземпляр класса
+SubjectId int ссылка на экземпляр класса
+
+- Отметка [Mark]:
+Id int Int32
+Content nvarchar(50) string
+StudentId int ссылка на экземпляр класса
+HeaderId int ссылка на экземпляр класса
+
+- Тема (заголовок) [Header]:
+Id int Int32
+Title nvarchar(max) string
+SubjectId int ссылка на экземпляр класса
+TeacherId int ссылка на экземпляр класса
+GroupId int ссылка на экземпляр класса
