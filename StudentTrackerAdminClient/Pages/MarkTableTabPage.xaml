@@ -1,0 +1,67 @@
+﻿<Page x:Class="StudentTrackerAdminClient.Pages.MarkTableTabPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:StudentTrackerAdminClient.Pages" xmlns:tabpagesviewmodels="clr-namespace:StudentTrackerAdminClient.ViewModels.TabPagesViewModels" d:DataContext="{d:DesignInstance Type=tabpagesviewmodels:MarkTableTabPageViewModel}"
+      mc:Ignorable="d" 
+      d:DesignHeight="450" d:DesignWidth="800"
+      Title="MarkTableTabPage">
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="10"></ColumnDefinition>
+            <ColumnDefinition Width="*"></ColumnDefinition>
+            <ColumnDefinition Width="10"></ColumnDefinition>
+            <ColumnDefinition Width="*"></ColumnDefinition>
+            <ColumnDefinition Width="10"></ColumnDefinition>
+            <ColumnDefinition Width="*"></ColumnDefinition>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="10"></RowDefinition>
+            <RowDefinition Height="35"></RowDefinition>
+            <RowDefinition Height="10"></RowDefinition>
+            <RowDefinition Height="55"></RowDefinition>
+            <RowDefinition Height="10"></RowDefinition>
+            <RowDefinition Height="22"></RowDefinition>
+            <RowDefinition Height="*"></RowDefinition>
+        </Grid.RowDefinitions>
+        <ToolBar x:Name="MainToolBar" Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="7">
+            <Button x:Name="SaveItemButton" Width="25" Command="{Binding Save}">
+                <Image Source="/Resources/save.png"></Image>
+            </Button>
+        </ToolBar>
+
+        <GroupBox x:Name="TeacherGroupBox" Grid.Row="3" Grid.Column="1" Header="Учитель">
+            <ComboBox x:Name="TeachersComboBox"
+			  ItemsSource="{Binding Teachers}" SelectedItem="{Binding CurrentTeacher}"></ComboBox>
+        </GroupBox>
+
+        <GroupBox x:Name="SubjectGroupBox" Grid.Column="3" Grid.Row="3" Header="Предмет">
+            <ComboBox x:Name="SubjectsComboBox"
+			  ItemsSource="{Binding Subjects}" SelectedItem="{Binding CurrentSubject}"></ComboBox>
+        </GroupBox>
+
+        <GroupBox x:Name="GroupGroupBox" Grid.Column="5" Grid.Row="3" Header="Группа">
+            <ComboBox x:Name="GroupsComboBox"
+			  ItemsSource="{Binding Groups}" SelectedItem="{Binding CurrentGroup}"></ComboBox>
+        </GroupBox>
+
+        <ScrollViewer x:Name="SLICScrollViewer" Grid.Column="0" Grid.ColumnSpan="3" Grid.Row="6"
+				  VerticalScrollBarVisibility="Hidden" HorizontalScrollBarVisibility="Disabled">
+            <ItemsControl x:Name="StudentsListItemsControl" ItemsSource="{Binding Students}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <TextBox Text="{Binding Name}"></TextBox>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
+        <ScrollViewer x:Name="HTSPScrollViewer" Grid.Column="3" Grid.Row="5" 
+				 Grid.ColumnSpan="5" Grid.RowSpan="2"
+				  HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
+            <StackPanel x:Name="HeadersTableStackPanel" Orientation="Horizontal">
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
+</Page>

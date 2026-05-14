@@ -1,5 +1,5 @@
 ﻿using StudentTrackerClient.ViewModels;
-using StudentTrackerLib.Models.Operational;
+using StudentTrackerLib.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;

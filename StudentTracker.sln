@@ -7,7 +7,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StudentTrackerClient", "Stu
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StudentTrackerLib", "StudentTrackerLib\StudentTrackerLib.csproj", "{1E4A1EC0-7C1A-4CE4-8D19-85290628464B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StudentClientServer", "StudentClientServer\StudentClientServer.csproj", "{04C8E638-53CB-46D8-92C5-9384A06EB158}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StudentTrackerServer", "StudentClientServer\StudentTrackerServer.csproj", "{04C8E638-53CB-46D8-92C5-9384A06EB158}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StudentTrackerAdminClient", "StudentTrackerAdminClient\StudentTrackerAdminClient.csproj", "{43588A43-ABBC-4DD0-A3A5-F04325293218}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -27,6 +29,10 @@ Global
 		{04C8E638-53CB-46D8-92C5-9384A06EB158}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{04C8E638-53CB-46D8-92C5-9384A06EB158}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{04C8E638-53CB-46D8-92C5-9384A06EB158}.Release|Any CPU.Build.0 = Release|Any CPU
+		{43588A43-ABBC-4DD0-A3A5-F04325293218}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{43588A43-ABBC-4DD0-A3A5-F04325293218}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{43588A43-ABBC-4DD0-A3A5-F04325293218}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{43588A43-ABBC-4DD0-A3A5-F04325293218}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

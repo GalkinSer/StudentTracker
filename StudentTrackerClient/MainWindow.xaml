@@ -6,11 +6,10 @@
 		xmlns:local="clr-namespace:StudentTracker" xmlns:viewmodels="clr-namespace:StudentTrackerClient.ViewModels" d:DataContext="{d:DesignInstance Type=viewmodels:MainWindowViewModel}"
 		xmlns:controls="clr-namespace:StudentTrackerClient.Controls"
 		mc:Ignorable="d"
-		Title="MainWindow" Height="450" Width="800">
+		Title="Электронный журнал" Height="500" Width="850">
 	<Grid>
 		<Grid.ColumnDefinitions>
 			<ColumnDefinition Width="10"></ColumnDefinition>
-			<ColumnDefinition Width="40"></ColumnDefinition>
 			<ColumnDefinition Width="*"></ColumnDefinition>
 			<ColumnDefinition Width="10"></ColumnDefinition>
 			<ColumnDefinition Width="*"></ColumnDefinition>
@@ -18,23 +17,50 @@
 			<ColumnDefinition Width="*"></ColumnDefinition>
 		</Grid.ColumnDefinitions>
 		<Grid.RowDefinitions>
-			<RowDefinition Height="10"></RowDefinition>
-			<RowDefinition Height="35"></RowDefinition>
-			<RowDefinition Height="10"></RowDefinition>
+            <RowDefinition Height="10"></RowDefinition>
+            <RowDefinition Height="35"></RowDefinition>
+            <RowDefinition Height="10"></RowDefinition>
+            <RowDefinition Height="55"></RowDefinition>
+            <RowDefinition Height="10"></RowDefinition>
 			<RowDefinition Height="22"></RowDefinition>
 			<RowDefinition Height="*"></RowDefinition>
 		</Grid.RowDefinitions>
-		<TextBlock x:Name="CurrentTeacherNameLabel" Grid.Column="2" Grid.Row="1"
-			   Text="{Binding CurrentTeacher.Name}" FontSize="15" 
-			   HorizontalAlignment="Center" TextWrapping="Wrap"></TextBlock>
-		<Button x:Name="SwitchTeacherButton" Grid.Column="1" Grid.Row="1" 
-				Content="Выход" ToolTip="Сменить текущего пользователя" 
-				Command="{Binding SwitchTeacher}" IsEnabled="{Binding IsTeacherPresent}"></Button>
-		<ComboBox x:Name="SubjectsComboBox" Grid.Column="4" Grid.Row="1"
+        <ToolBar x:Name="MainToolBar" Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="7">
+            <Button x:Name="SaveItemButton" Width="25" Command="{Binding Save}">
+                <Image Source="/Resources/save.png"></Image>
+            </Button>
+        </ToolBar>
+
+        <GroupBox x:Name="TeacherGroupBox" Grid.Row="3" Grid.Column="1" Header="Учитель">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="40"></ColumnDefinition>
+                    <ColumnDefinition Width="10"></ColumnDefinition>
+                    <ColumnDefinition Width="*"></ColumnDefinition>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"></RowDefinition>
+                </Grid.RowDefinitions>
+                <Button x:Name="SwitchTeacherButton" Grid.Column="0" Grid.Row="0" 
+					Content="Выход" ToolTip="Сменить текущего пользователя" 
+					Command="{Binding SwitchTeacher}" IsEnabled="{Binding IsTeacherPresent}"></Button>
+                <TextBlock x:Name="CurrentTeacherNameLabel" Grid.Column="3" Grid.Row="0"
+					Text="{Binding CurrentTeacher.Name}" FontSize="12" 
+					TextWrapping="Wrap"></TextBlock>
+            </Grid>
+        </GroupBox>
+
+        <GroupBox x:Name="SubjectGroupBox" Grid.Column="3" Grid.Row="3" Header="Предмет">
+            <ComboBox x:Name="SubjectsComboBox"
 				  ItemsSource="{Binding Subjects}" SelectedItem="{Binding CurrentSubject}"></ComboBox>
-		<ComboBox x:Name="GroupsComboBox" Grid.Column="6" Grid.Row="1"
+        </GroupBox>
+
+        <GroupBox x:Name="GroupGroupBox" Grid.Column="5" Grid.Row="3" Header="Группа">
+            <ComboBox x:Name="GroupsComboBox"
 				  ItemsSource="{Binding Groups}" SelectedItem="{Binding CurrentGroup}"></ComboBox>
-		<ScrollViewer x:Name="SLICScrollViewer" Grid.Column="0" Grid.ColumnSpan="3" Grid.Row="4"
+        </GroupBox>
+        
+		<ScrollViewer x:Name="SLICScrollViewer" Grid.Column="0" Grid.ColumnSpan="3" Grid.Row="6"
 					  VerticalScrollBarVisibility="Hidden" HorizontalScrollBarVisibility="Disabled">
 			<ItemsControl x:Name="StudentsListItemsControl" ItemsSource="{Binding Students}">
 				<ItemsControl.ItemTemplate>
@@ -44,7 +70,7 @@
 				</ItemsControl.ItemTemplate>
 			</ItemsControl>
 		</ScrollViewer>
-		<ScrollViewer x:Name="HTSPScrollViewer" Grid.Column="3" Grid.Row="3" 
+		<ScrollViewer x:Name="HTSPScrollViewer" Grid.Column="3" Grid.Row="5" 
 					 Grid.ColumnSpan="5" Grid.RowSpan="2"
 					  HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
 			<StackPanel x:Name="HeadersTableStackPanel" Orientation="Horizontal">

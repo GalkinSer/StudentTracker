@@ -39,9 +39,17 @@ namespace StudentTrackerClient.ViewModels
             _window = window;
         }
 
-        private void SendAuthenticationRequest(string _)
+        private async void SendAuthenticationRequest(string _)
         {
-            AuthenticatedTeacher = _serverApi.AuthenticateTeacher(new Teacher() { Name = Name, PasswordHash = Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(Password)))});
+            AuthenticatedTeacher = await _serverApi.AuthenticateTeacher
+                (new Teacher() 
+                    { 
+                        Name = Name, 
+                        PasswordHash = Convert.ToHexString(SHA256.HashData
+                        (Encoding.UTF8.GetBytes(Password)))
+                    },
+                CancellationToken.None);
+
             if (AuthenticatedTeacher == null)
             {
                 MessageBox.Show("ФИО или пароль неверны.", "Ошибка!", MessageBoxButton.OK, MessageBoxImage.Error);
@@ -49,6 +57,7 @@ namespace StudentTrackerClient.ViewModels
             }
             else
             {
+                _window.DialogResult = true;
                 _window.Close();
                 return;
             }

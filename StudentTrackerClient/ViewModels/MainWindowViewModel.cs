@@ -1,299 +1,413 @@
-﻿using StudentTrackerClient.Controls;
-using StudentTrackerClient.Services;
+﻿using StudentTrackerClient.Services;
 using StudentTrackerClient.ViewModels.Basics;
 using StudentTrackerClient.Windows;
+using StudentTrackerLib;
 using StudentTrackerLib.Models;
-using StudentTrackerLib.Models.Operational;
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Linq;
-using System.Reflection.PortableExecutable;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Data;
+using System.Diagnostics;
+using System.Windows;
 using System.Windows.Input;
 
 namespace StudentTrackerClient.ViewModels
 {
-	public class MainWindowViewModel : BaseViewModel
-	{
-		#region Fields
-		private Teacher _currentTeacher;
-		private Subject _currentSubject;
-		private Group _currentGroup;
+    public class MainWindowViewModel : BaseViewModel
+    {
+        #region Fields
+        private Teacher _currentTeacher;
+        private Subject _currentSubject;
+        private Group _currentGroup;
 
-		public event Action<Header> HeaderAdded;
-		public event Action<int> HeaderDeleted;
-		public event Action HeadersCleared;
-		public event Action<Header> HeaderEdited;
-		private readonly ServerApi _serverApi;
-		private int _headersCount;
-		private bool _isTeacherPresent;
-		private bool _isGroupSelected;
-		private List<int> _deletedHeadersIds;
-		#endregion
+        public event Action<Header> HeaderAdded;
+        public event Action<int> HeaderDeleted;
+        public event Action HeadersCleared;
+        public event Action<Header> HeaderEdited;
+        private readonly ServerApi _serverApi;
+        private List<Header> _reserveHeaders = new List<Header>();
+        private List<int> _deletedHeadersIds = new List<int>();
+        private List<int> _deletedMarksIds = new List<int>();
+        private bool _isTeacherPresent;
+        #endregion
 
-		#region Properties
-		public Teacher CurrentTeacher
-		{
-			get => _currentTeacher;
-			set
-			{
-				SetProperty(ref _currentTeacher, value);
-				if (value is not null)
-					IsTeacherPresent = true;
-				else
-					IsTeacherPresent = false;
-				GetSubjects();
-			}
-		}
-		public Subject CurrentSubject
-		{
-			get { return _currentSubject; }
-			set
-			{
-				SetProperty(ref _currentSubject, value);
-				GetGroups();
-			}
-		}
-		public Group CurrentGroup
-		{
-			get { return _currentGroup; }
-			set
-			{
-                SaveHeaders();
+        #region Properties
+        public Teacher CurrentTeacher
+        {
+            get => _currentTeacher;
+            set
+            {
+                SetProperty(ref _currentTeacher, value);
+                if (value is not null)
+                {
+                    if (Headers.Count > 0)
+                        SaveHeaders("");
+                    Subjects.Clear();
+                    Groups.Clear();
+                    Students.Clear();
+                    Headers.Clear();
+                    GetSubjects();
+                }
+            }
+        }
+        public Subject CurrentSubject
+        {
+            get { return _currentSubject; }
+            set
+            {
+                SetProperty(ref _currentSubject, value);
+                if (value is not null)
+                {
+                    if (Headers.Count > 0)
+                        SaveHeaders("");
+                    Groups.Clear();
+                    Students.Clear();
+                    Headers.Clear();
+                    GetGroups();
+                }
+            }
+        }
+        public Group CurrentGroup
+        {
+            get { return _currentGroup; }
+            set
+            {
                 SetProperty(ref _currentGroup, value);
-				GetStudents();
-				GetHeaders();
-			}
-		}
+                if (value != null)
+                {
+                    if (Headers.Count > 0)
+                        SaveHeaders("");
+                    Students.Clear();
+                    Headers.Clear();
+                    _reserveHeaders.Clear();
+                    GetTable();
+                }
+            }
+        }
+        public bool IsTeacherPresent
+        {
+            get { return _isTeacherPresent; }
+            set
+            {
+                SetProperty(ref _isTeacherPresent, value);
+            }
+        }
 
-		public ObservableCollection<Student> Students { get; set; }
-		public ObservableCollection<Group> Groups { get; set; }
-		public ObservableCollection<Subject> Subjects { get; set; }
-		public ObservableCollection<Header> Headers { get; set; }
+        public ObservableCollection<Teacher> Teachers { get; set; }
+        public ObservableCollection<Student> Students { get; set; }
+        public ObservableCollection<Group> Groups { get; set; }
+        public ObservableCollection<Subject> Subjects { get; set; }
+        public ObservableCollection<Header> Headers { get; set; }
 
-		public ICommand SwitchTeacher { get; set; }
-		public bool IsTeacherPresent
-		{
-			get => _isTeacherPresent;
-			set => SetProperty(ref _isTeacherPresent, value);
-		}
-		#endregion
+        public ICommand Save { get; set; }
+        public ICommand SwitchTeacher { get; set; }
+        #endregion
 
-		#region Constructors
-		public MainWindowViewModel()
-		{
-			HeaderAdded += Заглушка;
-			HeadersCleared += Заглушка;
-			HeaderDeleted += Заглушка;
-			HeaderEdited += Заглушка;
-			_serverApi = new ServerApi();
-			_deletedHeadersIds = new List<int>();
+        #region Constructors
+        public MainWindowViewModel()
+        {
+            HeaderAdded += Заглушка;
+            HeadersCleared += Заглушка;
+            HeaderDeleted += Заглушка;
+            HeaderEdited += Заглушка;
+            _serverApi = new ServerApi();
+            IsTeacherPresent = false;
 
-			Headers = new ObservableCollection<Header>();
-			CurrentTeacher = new Teacher();
-			Groups = new ObservableCollection<Group>();
-			Subjects = new ObservableCollection<Subject>();
-			Students = new ObservableCollection<Student>();
+            Headers = new ObservableCollection<Header>();
+            Teachers = new ObservableCollection<Teacher>();
 
-			Headers.CollectionChanged += Headers_CollectionChanged;
+            Groups = new ObservableCollection<Group>();
+            Subjects = new ObservableCollection<Subject>();
+            Students = new ObservableCollection<Student>();
 
-			SwitchTeacher = new Command<string>(OnSwitchTeacher);
-		}
-		public MainWindowViewModel(Action<Header> addHeaderHandler, Action<int> deleteHeaderHandler,
-			Action clearHeadersHandler) : this()
-		{
-			HeaderAdded -= Заглушка;
-			HeaderAdded += addHeaderHandler;
-			HeaderDeleted -= Заглушка;
-			HeaderDeleted += deleteHeaderHandler;
-			HeadersCleared -= Заглушка;
-			HeadersCleared += clearHeadersHandler;
-		}
-		#endregion
+            Save = new Command<string>(SaveHeaders);
+            SwitchTeacher = new Command<string>(OnSwitchTeacher);
 
-		#region Methods
-		private void Headers_CollectionChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
-		{
-			if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Add)
-			{
-				foreach (var item in e.NewItems)
-				{
-					if (item is Header Header)
-					{
-						HeaderAdded.Invoke(Header);
-						_headersCount++;
-					}
-				}
-			}
-			//else if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Remove)
-			//{
-			//	foreach (var item in e.OldItems)
-			//	{
-			//		if (item is Header Header)
-			//		{
-			//			HeaderDeleted.Invoke(Header.Id);
-			//			_headersCount--;
-			//		}
-			//	}
-			//}
-			else if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Reset)
-			{
-				HeadersCleared.Invoke();
-			}
-		}
-		public void BlankHeaderChanged(Header changedHeader)
-		{
-			if (Headers.IndexOf(changedHeader) == Headers.Count-1 || Headers.Count==1)
-			{
-				Header blankHeader = new Header()
-				{
-					Id = Headers.Max(x => x.Id)+1,
-					Group = CurrentGroup,
-					Subject = CurrentSubject,
-					Teacher = CurrentTeacher,
-				};
-				List<Mark> marksForBlankHeader = new List<Mark>();
-				foreach (Student student in Students)
-				{
-					marksForBlankHeader.Add(new Mark() { Student = student, Header = blankHeader });
-				}
-				blankHeader.Marks = marksForBlankHeader;
+            Headers.CollectionChanged += Headers_CollectionChanged;
+        }
+        public MainWindowViewModel(Action<Header> addHeaderHandler, Action<int> deleteHeaderHandler,
+            Action clearHeadersHandler) : this()
+        {
+            HeaderAdded -= Заглушка;
+            HeaderAdded += addHeaderHandler;
+            HeaderDeleted -= Заглушка;
+            HeaderDeleted += deleteHeaderHandler;
+            HeadersCleared -= Заглушка;
+            HeadersCleared += clearHeadersHandler;
+        }
+        #endregion
 
-				Headers.Add(blankHeader);
-			}
-		}
-		public void DeleteHeader(int headerId)
-		{
-			Header headerToDelete = Headers.SingleOrDefault(x => x.Id == headerId);
-			if (headerToDelete != null)
-			{
-				HeaderDeleted.Invoke(Headers.IndexOf(headerToDelete));
-				Headers.Remove(headerToDelete);
-				_deletedHeadersIds.Add(headerId);
-			}
-		}
-		public void OpenAuthWindow(object? sender, EventArgs e)
-		{
-			var authWindow = new AuthenticationWindow(_serverApi);
-			var dialogResult = authWindow.ShowDialog();
-			//if (dialogResult.HasValue == true && dialogResult.Value == true)
-			//{
-				CurrentTeacher = authWindow.GetAuthenticatedTeacher();
-			//}
-		}
+        #region Methods
+        private void Headers_CollectionChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Add)
+            {
+                foreach (var item in e.NewItems)
+                {
+                    if (item is Header Header)
+                    {
+                        HeaderAdded.Invoke(Header);
+                    }
+                }
+            }
+            else if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Reset)
+            {
+                HeadersCleared.Invoke();
+            }
+        }
+        public void BlankHeaderChanged(Header changedHeader)
+        {
+            if (Headers.IndexOf(changedHeader) == Headers.Count - 1 || Headers.Count == 1)
+            {
+                Header blankHeader = new Header()
+                {
+                    Id = -1,
+                    Group = CurrentGroup,
+                    Subject = CurrentSubject,
+                    Teacher = CurrentTeacher,
+                };
+                List<Mark> marksForBlankHeader = new List<Mark>();
+                foreach (Student student in Students)
+                {
+                    marksForBlankHeader.Add(new Mark() { Student = student, Header = blankHeader });
+                }
+                blankHeader.Marks = marksForBlankHeader;
+                _reserveHeaders.Add(new Header() { Id = -1 });
+                Headers.Add(blankHeader);
+            }
+        }
+        public void HeaderTitleIsEmpty(Header header)
+        {
+            if (header.Marks.Count == 0)
+            {
+                DeleteHeader(header.Id);
+            }
+            else
+            {
+                bool isMarkHasContent = false;
+                foreach (Mark mark in header.Marks)
+                {
+                    if (mark.Content != null && mark.Content != "" && mark.Content != string.Empty)
+                    {
+                        isMarkHasContent = true;
+                        break;
+                    }
+                }
+                if (!isMarkHasContent)
+                {
+                    DeleteHeader(header.Id);
+                }
+            }
+        }
+        public void DeleteHeader(int headerId)
+        {
+            Header headerToDelete = Headers.FirstOrDefault(x => x.Id == headerId);
+            if (headerToDelete != null)
+            {
+                int headerToDeleteIndex = Headers.IndexOf(headerToDelete);
+                HeaderDeleted.Invoke(headerToDeleteIndex);
+                Headers.Remove(headerToDelete);
+                //_reserveHeaders.Remove(reserveHeaderToDelete);
+                _reserveHeaders.RemoveAt(headerToDeleteIndex);
+                _deletedHeadersIds.Add(headerId);
+                foreach (Mark mark in headerToDelete.Marks)
+                {
+                    _deletedMarksIds.Add(mark.Id);
+                }
+            }
+        }
+        private void Заглушка(Header _)
+        {
 
-		private void Заглушка(Header _)
-		{
+        }
+        private void Заглушка(int _)
+        {
 
-		}
-		private void Заглушка(int _)
-		{
+        }
+        private void Заглушка()
+        {
 
-		}
-		private void Заглушка()
-		{
+        }
 
-		}
+        private async void GetSubjects()
+        {
+            CurrentSubject = null;
+            var subjects = await _serverApi.GetSubjects(CurrentTeacher.Id, CancellationToken.None);
+            if (subjects == null)
+            {
+                MessageBox.Show("Получить данные с сервера не удалось :(", "Ошибка!",
+                    MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+            Subjects = new ObservableCollection<Subject>(subjects);
+            InvokeOnPropertyChangedEvent(nameof(Subjects));
+        }
+        private async void GetGroups()
+        {
+            CurrentGroup = null;
+            var groups = await _serverApi.GetGroups(CurrentSubject.Id, CancellationToken.None);
+            if (groups == null)
+            {
+                MessageBox.Show("Получить данные с сервера не удалось :(", "Ошибка!",
+                    MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+            Groups = new ObservableCollection<Group>(groups);
+            InvokeOnPropertyChangedEvent(nameof(Groups));
+        }
+        private async Task GetStudents()
+        {
+            var students = await _serverApi.GetStudents(CurrentGroup.Id, CancellationToken.None);
+            if (students == null)
+            {
+                MessageBox.Show("Получить данные с сервера не удалось :(", "Ошибка!",
+                    MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+            Students = new ObservableCollection<Student>(students);
+            InvokeOnPropertyChangedEvent(nameof(Students));
+        }
+        private async Task GetHeaders()
+        {
+            var newHeaders = await _serverApi.GetHeaders
+                (
+                    CurrentTeacher.Id,
+                    CurrentSubject.Id,
+                    CurrentGroup.Id,
+                    CancellationToken.None
+                );
+            if (newHeaders == null)
+            {
+                MessageBox.Show("Получить данные с сервера не удалось :(", "Ошибка!",
+                    MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+            Headers.Clear();
 
-		private void GetSubjects()
-		{
-			CurrentSubject = null;
-			Subjects = new ObservableCollection<Subject>(_serverApi.GetSubjectsForTeacher(CurrentTeacher));
-			InvokeOnPropertyChangedEvent(nameof(Subjects));
-		}
-		private void GetGroups()
-		{
-			CurrentGroup = null;
-			Groups = new ObservableCollection<Group>(_serverApi.GetGroupsForSubject(CurrentSubject));
-			InvokeOnPropertyChangedEvent(nameof(Groups));
-		}
-		private void GetStudents()
-		{
-			Students = new ObservableCollection<Student>(from student in _serverApi.GetStudentsForGroup(CurrentGroup) orderby student.Name select student);
-			InvokeOnPropertyChangedEvent(nameof(Students));
-		}
-		private void GetHeaders()
-		{
-			List<Header> newHeaders = (_serverApi.GetHeaders(CurrentTeacher, CurrentGroup, CurrentSubject)).Select(x => new Header(x)).ToList();
-			Headers.Clear();
-			//int headerId = 0;
-			foreach (var header in newHeaders)
-			{
-				List<Mark> marks = _serverApi.GetMarks(header);
-				var nonPresentStudents = Students.Except(from mark in marks select mark.Student);
-				foreach (Student student in nonPresentStudents)
-				{
-					marks.Add(new Mark() { Student = student, Header = header });
-				}
-				marks = (from mark in marks orderby mark.Student select mark).ToList();
-				var completeHeader = new Header(marks)
-				{
-					Id = header.Id,
-					Group = header.Group,
-					Title = header.Title,
-					Teacher = header.Teacher,
-					Subject = header.Subject,
-				};
-				Headers.Add(completeHeader);
-				//headerId++;
-			}
+            foreach (var header in newHeaders)
+            {
+                var marks = await _serverApi.GetMarks(header.Id, CancellationToken.None);
+                if (marks == null)
+                {
+                    MessageBox.Show("Получить данные с сервера не удалось :(", "Ошибка!",
+                        MessageBoxButton.OK, MessageBoxImage.Error);
+                    return;
+                }
+                var marksList = marks.ToList();
 
-			if (CurrentGroup != null)
-			{
-				Header blankHeader = new Header()
-				{
-					Group = CurrentGroup,
-					Subject = CurrentSubject,
-					Teacher = CurrentTeacher,
-				};
-				List<Mark> marksForBlankHeader = new List<Mark>();
-				foreach (Student student in Students)
-				{
-					marksForBlankHeader.Add(new Mark() { Student = student, Header = blankHeader });
-				}
-				blankHeader.Marks = marksForBlankHeader;
-				Headers.Add(blankHeader);
-			}
+                var nonPresentStudents = Students.ExceptCollection(marksList.Select(x => x.Student));
+                foreach (Student student in nonPresentStudents)
+                {
+                    marksList.Add(new Mark() { Student = student, Header = header });
+                }
 
-			foreach (var header in Headers)
-			{
-				header.IsChanged = false;
-			}
-			#endregion
-		}
+                marksList = (from mark in marksList orderby mark.Student select mark).ToList();
 
-		private void OnSwitchTeacher(string _)
-		{
-			CurrentTeacher = null;
-			OpenAuthWindow(null, null);
-		}
+                var completeHeader = new Header(marksList)
+                {
+                    Id = header.Id,
+                    Group = header.Group,
+                    Title = header.Title,
+                    Teacher = header.Teacher,
+                    Subject = header.Subject,
+                };
+                Headers.Add(completeHeader);
+                _reserveHeaders.Add(new Header(completeHeader));
+            }
 
-		private void SaveHeaders()
-		{
-			foreach (var header in Headers)
-			{
-				if (header.IsChanged)
-				{
-					var thisHeader = Headers.FirstOrDefault(x => x.Id == header.Id);
-					if (thisHeader != null)
-					{
-						_serverApi.ChangeHeader(thisHeader.Id, header);
-					}
-					else
-					{
-						_serverApi.AddHeader(header);
-					}
-				}
-			}
-			foreach (int id in _deletedHeadersIds)
-			{
-				_serverApi.RemoveHeader(id);
-			}
-		}
-		
-	}
+            var blankHeaderId = 0;
+            if (Headers.Count > 0)
+                blankHeaderId = Headers.Max(x => x.Id) + 1;
+
+            Header blankHeader = new Header()
+            {
+                Id = -1,
+                Group = CurrentGroup,
+                Subject = CurrentSubject,
+                Teacher = CurrentTeacher,
+            };
+            List<Mark> marksForBlankHeader = new List<Mark>();
+            foreach (Student student in Students)
+            {
+                marksForBlankHeader.Add(new Mark() { Student = student, Header = blankHeader });
+            }
+            blankHeader.Marks = marksForBlankHeader;
+            Headers.Add(blankHeader);
+        }
+        private async void GetTable()
+        {
+            await GetStudents();
+            await GetHeaders();
+        }
+
+        private async void SaveHeaders(string _)
+        {
+            var headersToSave = Headers.Take(Headers.Count - 1).ToList();
+            var reserveHeaders = new List<Header>(_reserveHeaders);
+
+            for (int i = 0; i < headersToSave.Count; i++)
+            {
+                Header header = headersToSave[i];
+                Header reserveHeader = reserveHeaders[i];
+                if (!header.Equals(reserveHeader))
+                {
+                    if (reserveHeader.Id == -1)
+                    {
+                        await _serverApi.AddHeader(header, CancellationToken.None);
+                        foreach (var mark in header.Marks)
+                        {
+                            if (!string.IsNullOrEmpty(mark.Content))
+                                await _serverApi.AddMark(mark, CancellationToken.None);
+                        }
+                        _reserveHeaders[i] = new Header(header);
+                    }
+                    else
+                    {
+                        if (!header.Title.Equals(reserveHeader.Title))
+                            _serverApi.ChangeHeader(headersToSave[i].Id, headersToSave[i], CancellationToken.None);
+                        for (int markI = 0; markI < header.Marks.Count; markI++)
+                        {
+                            if (string.IsNullOrEmpty(header.Marks[markI].Content))
+                            {
+                                _serverApi.RemoveMark(header.Marks[markI].Id, CancellationToken.None);
+                            }
+                            else if (!header.Marks[markI].Content.Equals(reserveHeader.Marks[markI]))
+                            {
+                                if (string.IsNullOrEmpty(reserveHeader.Marks[markI].Content))
+                                    await _serverApi.AddMark(header.Marks[markI], CancellationToken.None);
+                                else
+                                    _serverApi.ChangeMark(header.Marks[markI].Id, header.Marks[markI], CancellationToken.None);
+                            }
+                        }
+                        _reserveHeaders[i] = new Header(header);
+                    }
+                }
+            }
+            foreach (int id in _deletedHeadersIds)
+            {
+                _serverApi.RemoveHeader(id, CancellationToken.None);
+            }
+            foreach (int id in _deletedMarksIds)
+            {
+                _serverApi.RemoveMark(id, CancellationToken.None);
+            }
+        }
+
+        private void OnSwitchTeacher(string _)
+        {
+            CurrentTeacher = null;
+            IsTeacherPresent = false;
+            OpenAuthWindow(null, null);
+        }
+        public void OpenAuthWindow(object? sender, EventArgs e)
+        {
+            var authWindow = new AuthenticationWindow(_serverApi);
+
+            authWindow.ShowDialog();
+
+            if (authWindow.DialogResult == true)
+            {
+                CurrentTeacher = authWindow.GetAuthenticatedTeacher();
+                IsTeacherPresent = true;
+            }
+        }
+        #endregion
+    }
 }

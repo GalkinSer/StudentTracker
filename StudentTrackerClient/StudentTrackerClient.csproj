@@ -12,4 +12,8 @@
     <ProjectReference Include="..\StudentTrackerLib\StudentTrackerLib.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Resource Include="Resources\save.png" />
+  </ItemGroup>
+
 </Project>

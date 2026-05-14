@@ -1,0 +1,58 @@
+﻿<Window x:Class="StudentTrackerAdminClient.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:StudentTrackerAdminClient" xmlns:viewmodels="clr-namespace:StudentTrackerAdminClient.ViewModels" d:DataContext="{d:DesignInstance Type=viewmodels:MainWindowViewModel}"
+        mc:Ignorable="d"
+        Title="Электронный журнал: панель администратора" Height="450" Width="800">
+    <Grid>
+        <TabControl x:Name="MainTabControl" SelectedIndex="{Binding SelectedTabIndex}">
+            <TabItem Header="Преподаватели">
+                <TabItem.ContentTemplate>
+                    <DataTemplate>
+                        <Grid>
+                            <Frame Source="Pages/TeachersTabPage.xaml"></Frame>
+                        </Grid>
+                    </DataTemplate>
+                </TabItem.ContentTemplate>
+            </TabItem>
+            <TabItem Header="Предметы">
+                <TabItem.ContentTemplate>
+                    <DataTemplate>
+                        <Grid>
+                            <Frame Source="Pages/SubjectsTabPage.xaml"></Frame>
+                        </Grid>
+                    </DataTemplate>
+                </TabItem.ContentTemplate>
+            </TabItem>
+            <TabItem Header="Группы">
+                <TabItem.ContentTemplate>
+                    <DataTemplate>
+                        <Grid>
+                            <Frame Source="Pages/GroupsTabPage.xaml"></Frame>
+                        </Grid>
+                    </DataTemplate>
+                </TabItem.ContentTemplate>
+            </TabItem>
+            <TabItem Header="Студенты">
+                <TabItem.ContentTemplate>
+                    <DataTemplate>
+                        <Grid>
+                            <Frame Source="Pages/StudentsTabPage.xaml"></Frame>
+                        </Grid>
+                    </DataTemplate>
+                </TabItem.ContentTemplate>
+            </TabItem>
+            <TabItem Header="Оценки">
+                <TabItem.ContentTemplate>
+                    <DataTemplate>
+                        <Grid>
+                            <Frame Source="Pages/MarkTableTabPage.xaml"></Frame>
+                        </Grid>
+                    </DataTemplate>
+                </TabItem.ContentTemplate>
+            </TabItem>
+        </TabControl>
+    </Grid>
+</Window>

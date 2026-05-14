@@ -13,7 +13,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using StudentTrackerClient.ViewModels;
-using StudentTrackerLib.Models.Operational;
+using StudentTrackerLib.Models;
 
 namespace StudentTrackerClient.Controls
 {
@@ -31,7 +31,6 @@ namespace StudentTrackerClient.Controls
         private void ContentTextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
             ((Mark)DataContext).Content = ContentTextBox.Text;
-            ((Mark)DataContext).Header.IsChanged = true;
         }
 	}
 }

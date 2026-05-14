@@ -1,7 +1,6 @@
 ﻿using StudentTrackerClient.Controls;
 using StudentTrackerClient.ViewModels;
 using StudentTrackerLib.Models;
-using StudentTrackerLib.Models.Operational;
 using System.ComponentModel;
 using System.Text;
 using System.Windows;
@@ -26,14 +25,12 @@ namespace StudentTracker
 		public MainWindow()
 		{
 			DataContext = _viewModel = new MainWindowViewModel(AddHeaderControl, DeleteHeaderControl, ClearHeadersControls);
-			this.Initialized += _viewModel.OpenAuthWindow;
-			InitializeComponent();
-			//HeadersTableStackPanel.ScrollOwner = HTSPScrollViewer;
+            this.Initialized += _viewModel.OpenAuthWindow;
+            InitializeComponent();
 			HTSPScrollViewer.ScrollChanged += HTSPScrollViewer_ScrollChanged;
-			//_viewModel.CurrentTeacher = new Teacher() { Id = 0, Name = "Смирнов Ярослав Александрович" };
 		}
 
-		private void HTSPScrollViewer_ScrollChanged(object sender, ScrollChangedEventArgs e)
+        private void HTSPScrollViewer_ScrollChanged(object sender, ScrollChangedEventArgs e)
 		{
 			SLICScrollViewer.ScrollToVerticalOffset(e.VerticalOffset);
 		}
@@ -47,6 +44,7 @@ namespace StudentTracker
 		{
 			HeaderMarksItemControlViewModel viewModel = new HeaderMarksItemControlViewModel(header);
 			viewModel.BlankHeaderChanged += _viewModel.BlankHeaderChanged;
+			viewModel.HeaderTitleIsEmpty += _viewModel.HeaderTitleIsEmpty;
 			viewModel.DeleteHeader += _viewModel.DeleteHeader;
 			HeadersTableStackPanel.Children.Add(new HeaderMarksItemControl(viewModel) { MinWidth=50});
 		}

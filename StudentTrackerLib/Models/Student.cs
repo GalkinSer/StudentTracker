@@ -12,7 +12,9 @@ namespace StudentTrackerLib.Models
         public string Name { get; set; }
         public int StudentCardNumber { get; set; }
         public bool IsRepresentative { get; set; }
+        public int GroupId { get; set; }
         public Group Group { get; set; }
+        public List<Mark> Marks { get; set; }
 
         public Student()
         {
@@ -20,16 +22,32 @@ namespace StudentTrackerLib.Models
             Name = string.Empty;
             StudentCardNumber = 0;
             IsRepresentative = false;
+            GroupId = 0;
             Group = new Group();
+            Marks = new List<Mark>();
         }
-
+        public Student(Student student)
+        {
+            Id = student.Id;
+            Name = student.Name;
+            StudentCardNumber = student.StudentCardNumber;
+            IsRepresentative = student.IsRepresentative;
+            GroupId = student.GroupId;
+            Group = new Group(student.Group);
+            Marks = new List<Mark>();
+            foreach (var mark in student.Marks)
+            {
+                Marks.Add(mark);
+            }
+        }
         public override bool Equals(object? obj)
         {
             if (obj is Student student)
             {
-                return Id.Equals(student.Id) && Name.Equals(student.Name) 
+                return Id.Equals(student.Id) && Name.Equals(student.Name)
                     && StudentCardNumber.Equals(student.StudentCardNumber) &&
-                    IsRepresentative.Equals(student.IsRepresentative) && Group.Equals(student.Group);
+                    IsRepresentative.Equals(student.IsRepresentative) && Group.Equals(student.Group)
+                    ;//&& Marks.Equals(student.Marks);
             }
             return false;
         }

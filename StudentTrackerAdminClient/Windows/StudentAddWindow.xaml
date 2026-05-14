@@ -1,0 +1,61 @@
+﻿<Window x:Class="StudentTrackerAdminClient.Windows.StudentAddWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:StudentTrackerAdminClient.Windows" xmlns:addwindowsviewmodels="clr-namespace:StudentTrackerAdminClient.ViewModels.AddWindowsViewModels" d:DataContext="{d:DesignInstance Type=addwindowsviewmodels:StudentAddWindowViewModel}"
+        mc:Ignorable="d"
+        Title="StudentAddWindow" Height="350" Width="300">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="10"></ColumnDefinition>
+            <ColumnDefinition Width="75"></ColumnDefinition>
+            <ColumnDefinition Width="10"></ColumnDefinition>
+            <ColumnDefinition Width="*"></ColumnDefinition>
+            <ColumnDefinition Width="10"></ColumnDefinition>
+            <ColumnDefinition Width="*"></ColumnDefinition>
+            <ColumnDefinition Width="10"></ColumnDefinition>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="10"></RowDefinition>
+            <RowDefinition Height="35"></RowDefinition>
+            <RowDefinition Height="10"></RowDefinition>
+            <RowDefinition Height="35"></RowDefinition>
+            <RowDefinition Height="10"></RowDefinition>
+            <RowDefinition Height="35"></RowDefinition>
+            <RowDefinition Height="10"></RowDefinition>
+            <RowDefinition Height="35"></RowDefinition>
+            <RowDefinition Height="10"></RowDefinition>
+            <RowDefinition Height="*"></RowDefinition>
+            <RowDefinition Height="10"></RowDefinition>
+            <RowDefinition Height="25"></RowDefinition>
+            <RowDefinition Height="10"></RowDefinition>
+        </Grid.RowDefinitions>
+        <TextBlock x:Name="StudentNameTextBlock" Grid.Row="1" Grid.Column="1"
+            Text="ФИО:" FontSize="14" FontWeight="Bold"
+            VerticalAlignment="Center"></TextBlock>
+        <TextBlock x:Name="StudentCardNumberTextBlock" Grid.Row="3" Grid.Column="1"
+            Text="Номер СБ:" FontSize="14" FontWeight="Bold"
+            VerticalAlignment="Center"></TextBlock>
+        <TextBlock x:Name="StudentIsRepTextBlock" Grid.Row="5" Grid.Column="1"
+            Text="Является старостой:" TextWrapping="WrapWithOverflow" FontSize="14" FontWeight="Bold"
+            VerticalAlignment="Center"></TextBlock>
+        <TextBlock x:Name="StudentGroupTextBlock" Grid.Row="7" Grid.Column="1"
+            Text="Группа:" FontSize="14" FontWeight="Bold"
+            VerticalAlignment="Center"></TextBlock>
+
+        <TextBox x:Name="StudentNameTextBox" Grid.Row="1" Grid.Column="3" Grid.ColumnSpan="3"
+            Text="{Binding Student.Name}"></TextBox>
+        <TextBox x:Name="StudentCardNumberTextBox" Grid.Row="3" Grid.Column="3" Grid.ColumnSpan="3"
+            Text="{Binding Student.StudentCardNumber}"></TextBox>
+        <ComboBox x:Name="StudentGroupComboBox" Grid.Row="7" Grid.Column="3" Grid.ColumnSpan="3"
+            ItemsSource="{Binding Groups}" SelectedItem="{Binding Student.Group}"></ComboBox>
+        <CheckBox x:Name="StudentIsRepCheckBox" Grid.Row="5" Grid.Column="3"
+                  VerticalAlignment="Center" IsChecked="{Binding Student.IsRepresentative}"></CheckBox>
+
+        <Button x:Name="OkButton" Content="OK" Grid.Row="11" Grid.Column="5"
+            Command="{Binding Ok}" IsEnabled="{Binding IsOkEnabled}"></Button>
+        <Button x:Name="CancelButton" Content="Отмена" Grid.Row="11" Grid.Column="3"
+            Command="{Binding Cancel}"></Button>
+    </Grid>
+</Window>

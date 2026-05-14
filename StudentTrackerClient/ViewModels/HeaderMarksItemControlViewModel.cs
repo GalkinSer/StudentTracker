@@ -1,5 +1,5 @@
 ﻿using StudentTrackerClient.ViewModels.Basics;
-using StudentTrackerLib.Models.Operational;
+using StudentTrackerLib.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,6 +17,7 @@ namespace StudentTrackerClient.ViewModels
 		public Header Header { get; set; }
 		public ICommand DeleteHeaderCommand { get; set; }
 		public event Action<Header> BlankHeaderChanged;
+		public event Action<Header> HeaderTitleIsEmpty;
 		public event Action<int> DeleteHeader;
 
 		public HeaderMarksItemControlViewModel() 
@@ -34,10 +35,11 @@ namespace StudentTrackerClient.ViewModels
 			if (Header.Title is null || Header.Title == "" || Header.Title == string.Empty)
 				BlankHeaderChanged.Invoke(Header);
             Header.Title = ((TextBox)sender).Text;
-			Header.IsChanged = true;
-		}
+            if (Header.Title is null || Header.Title == "" || Header.Title == string.Empty)
+                HeaderTitleIsEmpty.Invoke(Header);
+        }
 
-		private void OnDeleteHeader(string _)
+        private void OnDeleteHeader(string _)
 		{
 			DeleteHeader.Invoke(Header.Id);
 		}

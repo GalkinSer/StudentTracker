@@ -1,0 +1,29 @@
+﻿<UserControl x:Class="StudentTrackerAdminClient.Controls.HeaderMarksItemControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:StudentTrackerAdminClient.Controls"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="22"></RowDefinition>
+            <RowDefinition Height="*"></RowDefinition>
+        </Grid.RowDefinitions>
+        <TextBox x:Name="TitleTextBox" Grid.Row="0" Text="{Binding Header.Title}">
+            <TextBox.ContextMenu>
+                <ContextMenu>
+                    <MenuItem Header="Удалить" Command="{Binding DeleteHeaderCommand}"></MenuItem>
+                </ContextMenu>
+            </TextBox.ContextMenu>
+        </TextBox>
+        <ItemsControl x:Name="MarksItemsControl" Grid.Row="1" ItemsSource="{Binding Header.Marks}">
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <local:MarkItemControl></local:MarkItemControl>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+    </Grid>
+</UserControl>
