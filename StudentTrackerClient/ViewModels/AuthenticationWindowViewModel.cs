@@ -8,6 +8,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Security.Cryptography;
 using System.Text;
+using StudentTrackerLib.Exceptions;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -41,26 +42,42 @@ namespace StudentTrackerClient.ViewModels
 
         private async void SendAuthenticationRequest(string _)
         {
-            AuthenticatedTeacher = await _serverApi.AuthenticateTeacher
-                (new Teacher() 
-                    { 
-                        Name = Name, 
+            try
+            {
+                AuthenticatedTeacher = await _serverApi.AuthenticateTeacher
+                    (new Teacher()
+                    {
+                        Name = Name,
                         PasswordHash = Convert.ToHexString(SHA256.HashData
-                        (Encoding.UTF8.GetBytes(Password)))
+                            (Encoding.UTF8.GetBytes(Password)))
                     },
-                CancellationToken.None);
+                    CancellationToken.None);
 
-            if (AuthenticatedTeacher == null)
+            }
+            catch (AuthenticationException)
             {
                 MessageBox.Show("ФИО или пароль неверны.", "Ошибка!", MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
-            else
+            catch
             {
+                MessageBox.Show("Получить данные с сервера не удалось :(", "Ошибка!",
+                    MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+
+            }
+            //if (AuthenticatedTeacher == null)
+            //{
+            //    MessageBox.Show("Получить данные с сервера не удалось :(", "Ошибка!",
+            //        MessageBoxButton.OK, MessageBoxImage.Error);
+            //    return;
+            //}
+            //else
+            //{
                 _window.DialogResult = true;
                 _window.Close();
                 return;
-            }
+            //}
         }
         internal void PasswordChanged(object sender, RoutedEventArgs e)
         {

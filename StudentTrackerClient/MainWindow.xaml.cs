@@ -27,6 +27,8 @@ namespace StudentTracker
 			DataContext = _viewModel = new MainWindowViewModel(AddHeaderControl, DeleteHeaderControl, ClearHeadersControls);
             this.Initialized += _viewModel.OpenAuthWindow;
             InitializeComponent();
+			if (_viewModel.IsTeacherPresent == false)
+				this.Close();
 			HTSPScrollViewer.ScrollChanged += HTSPScrollViewer_ScrollChanged;
 		}
 

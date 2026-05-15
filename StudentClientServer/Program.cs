@@ -1,3 +1,4 @@
+using Microsoft.Extensions.ObjectPool;
 using StudentTrackerServer.DbServices;
 using StudentTrackerServer.Services;
 using System.Text.Json.Serialization;
@@ -28,6 +29,8 @@ namespace StudentTrackerServer
 
             builder.Services.AddDbContext<STDbContext>();
 
+            builder.WebHost.UseUrls(GetUrlsFromConfig());
+
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
@@ -45,6 +48,24 @@ namespace StudentTrackerServer
             app.MapControllers();
 
             app.Run();
+        }
+
+        private static string[] GetUrlsFromConfig()
+        {
+            if (!File.Exists("app.config"))
+            {
+                return Array.Empty<string>();
+            }
+            List<string> urls = new List<string>();
+            using (var sr = new StreamReader(File.OpenRead("app.config")))
+            {
+                var data =  sr.ReadToEnd().Split("\r\n");
+                foreach (string url in data)
+                {
+                    urls.Add("http://" + url);
+                }
+            }
+            return urls.ToArray();
         }
     }
 }

@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using StudentTrackerLib.Models;
 using StudentTrackerServer.DbServices;
-using StudentTrackerServer.Exceptions;
+using StudentTrackerLib.Exceptions;
 
 namespace StudentTrackerServer.Services
 {

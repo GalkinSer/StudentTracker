@@ -3,7 +3,7 @@ using StudentTrackerLib.DTOs.DTOAuth;
 using StudentTrackerLib.DTOs;
 using StudentTrackerLib.Models;
 using StudentTrackerServer.Services;
-using StudentTrackerServer.Exceptions;
+using StudentTrackerLib.Exceptions;
 using StudentTrackerLib.DTOs.DTOTeacher;
 
 namespace StudentTrackerServer.Controllers

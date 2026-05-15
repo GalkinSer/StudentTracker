@@ -5,6 +5,7 @@ using StudentTrackerLib.DTOs.DTOMark;
 using StudentTrackerLib.DTOs.DTOStudent;
 using StudentTrackerLib.DTOs.DTOSubject;
 using StudentTrackerLib.DTOs.DTOTeacher;
+using StudentTrackerLib.Exceptions;
 using StudentTrackerLib.Models;
 using System.Configuration;
 using System.Diagnostics;
@@ -51,13 +52,14 @@ namespace StudentTrackerClient.Services
 
             var response = await client.PostAsync("/api/auth", content, cancellationToken);
 
-            if (!response.IsSuccessStatusCode)
+            if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+                throw new AuthenticationException();
+            else if (!response.IsSuccessStatusCode)
                 return null;
 
             var data = await response.Content.ReadFromJsonAsync<Teacher>(cancellationToken);
 
             return data;
-
         }
 
         internal async Task AddHeader(Header header, CancellationToken cancellationToken)

@@ -1,4 +1,4 @@
-﻿namespace StudentTrackerServer.Exceptions
+﻿namespace StudentTrackerLib.Exceptions
 {
     public class AuthenticationException : Exception
     {
